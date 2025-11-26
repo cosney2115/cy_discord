@@ -13,12 +13,17 @@ CreateThread(function()
         }
     }
 
-    client.on("ready", function(data)
+    client:on("ready", function(data)
         print("READY")
     end)
 
-    client.on("messageCreate", function(data)
-        print(data.content)
+    client:on("messageCreate", function(data)
+        if data.author.bot then return end
+        if data.content ~= '!ping' then
+            return
+        end
+
+        data:reply("Pong!")
     end)
 
     client:connect()

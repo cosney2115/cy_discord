@@ -5,7 +5,7 @@ local function toCamelCase(str)
 end
 
 function Events:new(client)
-    self = setmetatable({}, Events)
+    local self = setmetatable({}, Events)
     self.client = client
 
     self.init = function()
@@ -26,7 +26,12 @@ function Events:new(client)
             self.client.isReady = true
         end
 
-        self.client.emit(eventName, payload.d)
+        local data = payload.d
+        if eventType == "MESSAGE_CREATE" then
+            data = Message:new(data, self.client)
+        end
+
+        self.client.emit(eventName, data)
     end
 
     return self

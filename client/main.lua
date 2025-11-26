@@ -43,21 +43,22 @@ Intents = {
 ---@field events table
 ---@field intents number
 ---@field isReady boolean
----@field on fun(event: DiscordEvent, callback: function)
----@field connect fun(): Client
----@field emit fun(event: string, ...: any)
+---@field on fun(self: Client, event: DiscordEvent, callback: function)
+---@field connect fun(self: Client): Client
+---@field emit fun(self: Client, event: string, ...: any)
+---@field getChannel fun(self: Client, channelId: string): Channel
 Client = {}
 
 ---@param data ClientConfig
 ---@return Client
 function Client:new(data)
-    ---@type Client
     self = setmetatable({}, Client)
     self.websocket = nil
     self.data = data
     self.events = {}
     self.intents = 0
     self.isReady = false
+    self.rest = RequestHandler:new(data.token)
 
     if data.intents and type(data.intents) == "table" then
         self.intents = 0
@@ -70,6 +71,29 @@ function Client:new(data)
 
     self.eventHandler = Events:new(self)
     self.eventHandler.init()
+
+    self.on = function(this, event, callback)
+        local evt = event
+        local cb = callback
+        if this ~= self then
+            evt = this
+            cb = event
+        end
+
+        self.events[evt] = cb
+    end
+
+    self.emit = function(event, ...)
+        if not self.events[event] then
+            return
+        end
+
+        if type(self.events[event]) ~= "function" and type(self.events[event]) ~= "table" then
+            return
+        end
+
+        self.events[event](...)
+    end
 
     self.init = function()
         self.websocket = exports['cfx-discord']:WebSocketClient(
@@ -96,36 +120,25 @@ function Client:new(data)
                 self.emit("error", err)
                 return
             end
-
-            self.emit("ready")
         end)
 
         return self
-    end
-
-    self.on = function(event, callback)
-        self.events[event] = callback
     end
 
     self.connect = function()
         return self.init()
     end
 
-    self.emit = function(event, ...)
-        if not self.events[event] then
-            return
+    self.getChannel = function(this, channelId)
+        local id = channelId
+        if this ~= self then
+            id = this
         end
-
-        if type(self.events[event]) ~= "function" and type(self.events[event]) ~= "table" then
-            return
-        end
-
-        self.events[event](...)
+        return Channel:new {
+            id = id,
+            type = 0
+        }, self
     end
 
     return self
 end
-
-exports('new', function(data)
-    return Client:new(data)
-end)

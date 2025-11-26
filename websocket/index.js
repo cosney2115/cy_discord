@@ -11,17 +11,11 @@ class WebSocketClient {
   async connect() {
     this.socket = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
     return new Promise((resolve, reject) => {
-      this.socket.on("open", () => {
-        resolve();
-      });
+      this.socket.on("open", () => resolve());
 
-      this.socket.on("error", (err) => {
-        reject(err);
-      });
+      this.socket.on("error", (err) => reject(err));
 
-      this.socket.on("close", (code, reason) => {
-        console.log(`WebSocket closed - Code: ${code}, Reason: ${reason}`);
-      });
+      this.socket.on("close", (code, reason) => console.log(`WebSocket closed - Code: ${code}, Reason: ${reason}`));
 
       this.socket.on("message", (data) => {
         const payload = JSON.parse(data.toString());
@@ -32,12 +26,10 @@ class WebSocketClient {
           this.identify();
         }
 
-        if (payload.op === 0) {
-          emit("discord:message", payload);
-        }
+        if (payload.op === 0) emit("discord:message", payload);
 
         if (payload.op === 9)
-          console.log("Invalid Session - sprawdź token i intenty!");
+          console.error("Invalid Session - Check token and intents!")
 
         // if (payload.op === 11) console.log("Heartbeat ACK");
       });
@@ -77,6 +69,7 @@ class WebSocketClient {
 
 exports("WebSocketClient", (token, guildId, intents) => {
   const client = new WebSocketClient(token, guildId, intents);
+
   return {
     connect: (cb) => {
       client.connect()
