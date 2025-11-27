@@ -4,7 +4,6 @@
 
 <p>
   <img src="https://img.shields.io/github/v/release/cosney2115/cy_discord?style=for-the-badge&color=blue" alt="Release" />
-  <img src="https://img.shields.io/github/downloads/cosney2115/cy_discord/total?style=for-the-badge&color=green" alt="Downloads" />
 </p>
 
 <br />
