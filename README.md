@@ -3,8 +3,8 @@
 **A lightweight, no-nonsense Discord wrapper for FiveM.**
 
 <p>
-  <img src="https://img.shields.io/github/v/release/cosney2115/cy_discord?style=for-the-badge&color=blue" alt="Release" />
-  <img src="https://img.shields.io/github/downloads/cosney2115/cy_discord/total?style=for-the-badge&color=green" alt="Downloads" />
+  <img src="https://img.shields.io/github/v/release/cosney2115/cfx-discord?style=for-the-badge&color=blue" alt="Release" />
+  <img src="https://img.shields.io/github/downloads/cosney2115/cfx-discord/total?style=for-the-badge&color=green" alt="Downloads" />
 </p>
 
 <br />
@@ -13,7 +13,6 @@
 
 - <img src="https://img.shields.io/badge/Real--time-Fast-2ea44f?style=flat-square" valign="middle" /> Handles messages and interactions instantly.
 - <img src="https://img.shields.io/badge/Slash_Commands-Easy-0366d6?style=flat-square" valign="middle" /> Easy registration and handling.
-- <img src="https://img.shields.io/badge/Ephemeral-Private-d93f0b?style=flat-square" valign="middle" /> Support for private (ephemeral) replies.
 - <img src="https://img.shields.io/badge/Simple_API-Event--driven-f1e05a?style=flat-square" valign="middle" /> Event-driven design familiar to Discord.js users.
 
 ## Installation
