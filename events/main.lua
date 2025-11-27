@@ -29,6 +29,8 @@ function Events:new(client)
         local data = payload.d
         if eventType == "MESSAGE_CREATE" then
             data = Message:new(data, self.client)
+        elseif eventType == "INTERACTION_CREATE" then
+            data = Interaction:new(data, self.client)
         end
 
         self.client.emit(eventName, data)
