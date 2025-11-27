@@ -1,3 +1,8 @@
+---@class Channel
+---@field id string
+---@field type number
+---@field client Client
+---@field send fun(self: Channel, content: string|table): table
 Channel = {}
 
 function Channel:new(data, client)
@@ -26,7 +31,7 @@ function Channel:new(data, client)
             :next(function(data)
                 p:resolve(data)
             end, function(err)
-                p:reject(err)
+                p:reject("Discord API Error: " .. tostring(err.statusCode) .. " - " .. tostring(err.body))
             end)
 
         return Citizen.Await(p)
