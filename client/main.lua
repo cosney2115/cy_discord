@@ -8,6 +8,7 @@
 ---| "messageReactionRemove"
 ---| "messageReactionRemoveAll"
 ---| "messageReactionRemoveEmoji"
+---| "interactionCreate"
 ---| "error"
 
 Intents = {
@@ -35,7 +36,8 @@ Intents = {
 ---@class ClientConfig
 ---@field token string
 ---@field guildId string
----@field intents number|table
+---@field applicationId string
+---@field intents number|tablelib
 
 ---@class Client
 ---@field websocket table
@@ -43,6 +45,9 @@ Intents = {
 ---@field events table
 ---@field intents number
 ---@field isReady boolean
+---@field on fun(self: Client, event: "messageCreate", callback: fun(message: Message))
+---@field on fun(self: Client, event: "interactionCreate", callback: fun(interaction: Interaction))
+---@field on fun(self: Client, event: "ready", callback: fun())
 ---@field on fun(self: Client, event: DiscordEvent, callback: function)
 ---@field connect fun(self: Client): Client
 ---@field emit fun(self: Client, event: string, ...: any)
@@ -59,6 +64,10 @@ function Client:new(data)
     self.intents = 0
     self.isReady = false
     self.rest = RequestHandler:new(data.token)
+
+    assert(data.token, "Missing token")
+    assert(data.guildId, "Missing guildId")
+    assert(data.applicationId, "Missing applicationId")
 
     if data.intents and type(data.intents) == "table" then
         self.intents = 0
@@ -83,20 +92,30 @@ function Client:new(data)
         self.events[evt] = cb
     end
 
-    self.emit = function(event, ...)
-        if not self.events[event] then
+    self.emit = function(this, event, ...)
+        local evt = event
+        local args = { ... }
+        if this ~= self then
+            evt = this
+            args = {
+                event,
+                ...
+            }
+        end
+
+        if not self.events[evt] then
             return
         end
 
-        if type(self.events[event]) ~= "function" and type(self.events[event]) ~= "table" then
+        if type(self.events[evt]) ~= "function" and type(self.events[evt]) ~= "table" then
             return
         end
 
-        self.events[event](...)
+        self.events[evt](table.unpack(args))
     end
 
     self.init = function()
-        self.websocket = exports['cfx-discord']:WebSocketClient(
+        self.websocket = exports[GetCurrentResourceName()]:WebSocketClient(
             self.data.token,
             self.data.guildId,
             self.intents
@@ -134,10 +153,28 @@ function Client:new(data)
         if this ~= self then
             id = this
         end
-        return Channel:new {
+        return Channel:new({
             id = id,
             type = 0
-        }, self
+        }, self)
+    end
+
+    self.createCommand = function(this, command)
+        local cmd = command
+        if this ~= self then
+            cmd = this
+        end
+
+        local p = promise.new()
+
+        self.rest:request('POST', '/applications/' .. self.data.applicationId .. '/commands', cmd)
+            :next(function(data)
+                p:resolve(data)
+            end, function(err)
+                p:reject(err)
+            end)
+
+        return Citizen.Await(p)
     end
 
     return self
