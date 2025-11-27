@@ -1,13 +1,11 @@
-<div align="center">
-  <h1>cy_discord</h1>
-  <p><strong>A lightweight, no-nonsense Discord wrapper for FiveM.</strong></p>
+# cy_discord
 
-  <p>
-    <img src="https://img.shields.io/badge/FiveM-Ready-orange?style=for-the-badge&logo=fivem&logoColor=white" alt="FiveM Ready" />
-    <img src="https://img.shields.io/badge/Lua-5.4-blue?style=for-the-badge&logo=lua&logoColor=white" alt="Lua 5.4" />
-    <img src="https://img.shields.io/badge/Discord-API-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord API" />
-  </p>
-</div>
+**A lightweight, no-nonsense Discord wrapper for FiveM.**
+
+<p>
+  <img src="https://img.shields.io/github/v/release/cosney2115/cy_discord?style=for-the-badge&color=blue" alt="Release" />
+  <img src="https://img.shields.io/github/downloads/cosney2115/cy_discord/total?style=for-the-badge&color=green" alt="Downloads" />
+</p>
 
 <br />
 
@@ -90,23 +88,14 @@ end)
 
 ## fxmanifest
 
+Add the following to your `fxmanifest.lua` in `server_scripts`:
+
 ```lua
-fx_version 'cerulean'
-game 'gta5'
+server_script '@cy_discord/client/main.lua'
 
-server_scripts {
-    -- Client
-    '@cy_discord/client/main.lua',
-
-    -- ur resources
-}
-
-server_only 'yes'
-lua54 'yes'
-use_experimental_fxv2_oal 'yes'
 ```
 
-## TODO
+## Future Plans
 
 - [x] Event handler
 - [x] Slash commands
