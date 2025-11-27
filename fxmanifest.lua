@@ -6,9 +6,13 @@ server_scripts {
     'http/main.lua',
     'structures/Channel.lua',
     'structures/Message.lua',
+    'structures/Interaction.lua',
     'client/*.lua',
     'events/*.lua',
-    'example.lua',
+
+
+    -- examples
+    'examples/*.lua',
 }
 
 server_only 'yes'
