@@ -68,16 +68,19 @@ function Interaction:new(data, client)
             optName = this
         end
 
-        if not self.data or not self.data.options then
+        local data = self.data
+        if not data or not data.options then
             return nil
         end
 
-        for i = 1, #self.data.options do
-            local option = self.data.options[i]
+        local options = data.options
+        for i = 1, #options do
+            local option = options[i]
             if option.name == optName then
                 return option.value
             end
         end
+
         return nil
     end
 
