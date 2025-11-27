@@ -10,7 +10,6 @@ server_scripts {
     'client/*.lua',
     'events/*.lua',
 
-
     -- examples
     'examples/*.lua',
 }
