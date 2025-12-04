@@ -84,6 +84,29 @@ client:on('messageCreate', function(message)
 end)
 ```
 
+### Embeds
+
+```lua
+client:on('interactionCreate', function(interaction)
+    if interaction.data.name == 'embed' then
+        local embed = Embed:new()
+            :setTitle("Hello World")
+            :setDescription("This is an embed")
+            :setColor(0x00FF00)
+            :addField("Field 1", "Value 1", true)
+            :addField("Field 2", "Value 2", true)
+            :setFooter("Footer text", "https://picsum.photos/200")
+
+        interaction:reply({
+            embeds = { --[[ array of embeds ]]
+                embed
+            }
+        }, false --[[ ephemeral ]])
+        return
+    end
+end)
+```
+
 ## fxmanifest
 
 Add the following to your `fxmanifest.lua` in `server_scripts`:
@@ -98,7 +121,7 @@ server_script '@cy_discord/client/main.lua'
 - [x] Event handler
 - [x] Slash commands
 - [x] Message events
-- [ ] Embeds support (Rich messages)
+- [x] Embeds support (Rich messages)
 - [ ] Components (Buttons, Select Menus)
 - [ ] Voice channel events
 - [ ] Modal support
