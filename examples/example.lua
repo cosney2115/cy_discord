@@ -41,6 +41,11 @@ CreateThread(function()
                 }
             }
         })
+
+        client:createCommand({
+            name = "embed",
+            description = "Send an embed"
+        })
     end)
 
     client:on("interactionCreate", function(interaction)
@@ -54,13 +59,25 @@ CreateThread(function()
             local channelId = interaction:getOption("channel")
             local channel = client:getChannel(channelId)
 
-            if not channel then
-                interaction:reply("Channel not found!", true)
-                return
-            end
-
             channel:send(message)
             interaction:reply("Message sent!", true)
+            return
+        end
+
+        if interaction.data.name == "embed" then
+            local embed = Embed:new()
+                :setTitle("Hello World")
+                :setDescription("This is an embed")
+                :setColor(0x00FF00)
+                :addField("Field 1", "Value 1", true)
+                :addField("Field 2", "Value 2", true)
+                :setFooter("Footer text", "https://picsum.photos/200")
+
+            interaction:reply({
+                embeds = {
+                    embed
+                }
+            }, false)
             return
         end
     end)

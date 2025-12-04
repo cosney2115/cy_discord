@@ -46,6 +46,19 @@ function Interaction:new(data, client)
 
         local p = promise.new()
 
+        local function sanitize(tbl)
+            if type(tbl) ~= "table" then return tbl end
+            local newTbl = {}
+            for k, v in pairs(tbl) do
+                if type(v) == "table" then
+                    newTbl[k] = sanitize(v)
+                elseif type(v) ~= "function" then
+                    newTbl[k] = v
+                end
+            end
+            return newTbl
+        end
+
         PerformHttpRequest('https://discord.com/api/v10/interactions/' .. self.id .. '/' .. self.token .. '/callback',
             function(statusCode, responseBody, headers)
                 if statusCode < 200 or statusCode >= 300 then
@@ -57,7 +70,7 @@ function Interaction:new(data, client)
                 end
 
                 p:resolve(true)
-            end, 'POST', json.encode(body), { ['Content-Type'] = 'application/json' })
+            end, 'POST', json.encode(sanitize(body)), { ['Content-Type'] = 'application/json' })
 
         return Citizen.Await(p)
     end

@@ -7,6 +7,7 @@ server_scripts {
     'structures/Channel.lua',
     'structures/Message.lua',
     'structures/Interaction.lua',
+    'structures/Embed.lua',
     'client/*.lua',
     'events/*.lua',
 

@@ -15,6 +15,19 @@ function RequestHandler:new(token)
             ['Content-Type'] = 'application/json'
         }
 
+        local function sanitize(tbl)
+            if type(tbl) ~= "table" then return tbl end
+            local newTbl = {}
+            for k, v in pairs(tbl) do
+                if type(v) == "table" then
+                    newTbl[k] = sanitize(v)
+                elseif type(v) ~= "function" then
+                    newTbl[k] = v
+                end
+            end
+            return newTbl
+        end
+
         PerformHttpRequest('https://discord.com/api/v10' .. endpoint, function(statusCode, responseBody, headers)
             if statusCode < 200 or statusCode >= 300 then
                 p:reject({
@@ -32,7 +45,7 @@ function RequestHandler:new(token)
             end
 
             p:resolve(body)
-        end, method, data and json.encode(data) or "", headers)
+        end, method, data and json.encode(sanitize(data)) or "", headers)
 
         return p
     end
