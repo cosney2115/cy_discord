@@ -20,17 +20,49 @@ CreateThread(function()
         -- slash commands
         client:createCommand({
             name = "ping",
-            description = "Pong!"
+            description = "Pong!",
+        })
+
+        client:createCommand({
+            name = "say",
+            description = "Say something",
+            options = {
+                {
+                    name = "message",
+                    description = "The message to say",
+                    type = OptionType.STRING,
+                    required = true
+                },
+                {
+                    name = "channel",
+                    description = "The channel to send the message to",
+                    type = OptionType.CHANNEL,
+                    required = true
+                }
+            }
         })
     end)
 
     client:on("interactionCreate", function(interaction)
-        if interaction.data.name ~= "ping" then
+        if interaction.data.name == "ping" then
+            interaction:reply("Pong!", true)
             return
         end
 
-        -- reply Pong! with ephemeral
-        interaction:reply("Pong!", true)
+        if interaction.data.name == "say" then
+            local message = interaction:getOption("message")
+            local channelId = interaction:getOption("channel")
+            local channel = client:getChannel(channelId)
+
+            if not channel then
+                interaction:reply("Channel not found!", true)
+                return
+            end
+
+            channel:send(message)
+            interaction:reply("Message sent!", true)
+            return
+        end
     end)
 
     -- Can use commands like that or ^ with interactionCreate

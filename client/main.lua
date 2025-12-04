@@ -33,11 +33,48 @@ Intents = {
     AUTO_MODERATION_EXECUTION = 2097152
 }
 
----@class ClientConfig
----@field token string
----@field guildId string
----@field applicationId string
----@field intents number|tablelib
+OptionType = {
+    SUB_COMMAND = 1,
+    SUB_COMMAND_GROUP = 2,
+    STRING = 3,
+    INTEGER = 4,
+    BOOLEAN = 5,
+    USER = 6,
+    CHANNEL = 7,
+    ROLE = 8,
+    MENTIONABLE = 9,
+    NUMBER = 10,
+    ATTACHMENT = 11,
+}
+
+---@alias ClientConfig
+---| { token: string, guildId: string, applicationId: string, intents: number|tablelib }
+
+---@alias OptionType
+---| 1 "SUB_COMMAND"
+---| 2 "SUB_COMMAND_GROUP"
+---| 3 "STRING"
+---| 4 "INTEGER"
+---| 5 "BOOLEAN"
+---| 6 "USER"
+---| 7 "CHANNEL"
+---| 8 "ROLE"
+---| 9 "MENTIONABLE"
+---| 10 "NUMBER"
+---| 11 "ATTACHMENT"
+
+---@class Option
+---@field name string
+---@field description string
+---@field type OptionType
+---@field required boolean?
+---@field choices tablelib?
+---@field options Option[]?
+
+---@class Command
+---@field name string
+---@field description string
+---@field options Option[]?
 
 ---@class Client
 ---@field websocket table
@@ -52,6 +89,7 @@ Intents = {
 ---@field connect fun(self: Client): Client
 ---@field emit fun(self: Client, event: string, ...: any)
 ---@field getChannel fun(self: Client, channelId: string): Channel
+---@field createCommand fun(self: Client, command: Command): table
 Client = {}
 
 ---@param data ClientConfig
