@@ -46,6 +46,11 @@ CreateThread(function()
             name = "embed",
             description = "Send an embed"
         })
+
+        client:createCommand({
+            name = "components",
+            description = "Test components (buttons, select menus)"
+        })
     end)
 
     client:on("interactionCreate", function(interaction)
@@ -78,6 +83,53 @@ CreateThread(function()
                     embed
                 }
             }, false)
+            return
+        end
+
+        if interaction.data.name == "components" then
+            local row = ActionRow:new()
+                :addComponent(
+                    Button:new()
+                    :setLabel("Click Me")
+                    :setStyle(1)
+                    :setCustomId("click_one")
+                )
+                :addComponent(
+                    Button:new()
+                    :setLabel("Danger")
+                    :setStyle(4)
+                    :setCustomId("click_two")
+                    :setDisabled(true)
+                )
+
+            local row2 = ActionRow:new()
+                :addComponent(
+                    SelectMenu:new()
+                    :setCustomId("select_one")
+                    :setPlaceholder("Choose an option")
+                    :addOption("Option 1", "opt_1", "This is option 1", { name = "👍" })
+                    :addOption("Option 2", "opt_2", "This is option 2")
+                )
+
+            interaction:reply({
+                content = "Look at these components!",
+                components = {
+                    row,
+                    row2
+                }
+            }, false)
+            return
+        end
+
+        -- Component Interactions
+        if interaction:getCustomId() == "click_one" then
+            interaction:reply("You clicked the button!", true)
+            return
+        end
+
+        if interaction:getCustomId() == "select_one" then
+            local values = interaction:getValues()
+            interaction:reply("You selected: " .. json.encode(values), true)
             return
         end
     end)

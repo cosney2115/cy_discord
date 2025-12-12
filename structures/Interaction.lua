@@ -8,6 +8,8 @@
 ---@field client Client
 ---@field reply fun(self: Interaction, content: string|table, ephemeral: boolean): table
 ---@field getOption fun(self: Interaction, name: string): any
+---@field getCustomId fun(self: Interaction): string
+---@field getValues fun(self: Interaction): table
 Interaction = {}
 
 function Interaction:new(data, client)
@@ -94,7 +96,16 @@ function Interaction:new(data, client)
             end
         end
 
+
         return nil
+    end
+
+    self.getCustomId = function()
+        return self.data.custom_id
+    end
+
+    self.getValues = function()
+        return self.data.values
     end
 
     return self
