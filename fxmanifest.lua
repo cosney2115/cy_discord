@@ -11,6 +11,7 @@ server_scripts {
     'structures/components/ActionRow.lua',
     'structures/Interaction.lua',
     'structures/Embed.lua',
+    'structures/VoiceState.lua',
     'client/*.lua',
     'events/*.lua',
 

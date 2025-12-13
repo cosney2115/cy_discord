@@ -9,6 +9,7 @@
 ---| "messageReactionRemoveAll"
 ---| "messageReactionRemoveEmoji"
 ---| "interactionCreate"
+---| "voiceStateUpdate"
 ---| "error"
 
 Intents = {
@@ -84,6 +85,7 @@ OptionType = {
 ---@field isReady boolean
 ---@field on fun(self: Client, event: "messageCreate", callback: fun(message: Message))
 ---@field on fun(self: Client, event: "interactionCreate", callback: fun(interaction: Interaction))
+---@field on fun(self: Client, event: "voiceStateUpdate", callback: fun(state: VoiceState))
 ---@field on fun(self: Client, event: "ready", callback: fun())
 ---@field on fun(self: Client, event: DiscordEvent, callback: function)
 ---@field connect fun(self: Client): Client

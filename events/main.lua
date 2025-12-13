@@ -31,6 +31,8 @@ function Events:new(client)
             data = Message:new(data, self.client)
         elseif eventType == "INTERACTION_CREATE" then
             data = Interaction:new(data, self.client)
+        elseif eventType == "VOICE_STATE_UPDATE" then
+            data = VoiceState:new(data, self.client)
         end
 
         self.client.emit(eventName, data)

@@ -10,7 +10,8 @@ CreateThread(function()
             Intents.DIRECT_MESSAGES,
             Intents.DIRECT_MESSAGE_REACTIONS,
             Intents.DIRECT_MESSAGE_TYPING,
-            Intents.MESSAGE_CONTENT
+            Intents.MESSAGE_CONTENT,
+            Intents.GUILD_VOICE_STATES,
         }
     }
 
@@ -193,6 +194,14 @@ CreateThread(function()
 
             message:reply("Revived player!")
         end
+    end)
+
+    client:on("voiceStateUpdate", function(voiceState)
+        if not voiceState.channelId then
+            return
+        end
+
+        print("User " .. voiceState.userId .. " joined channel: " .. voiceState.channelId)
     end)
 
     client:connect()

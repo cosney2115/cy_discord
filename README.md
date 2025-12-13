@@ -166,6 +166,18 @@ client:on('interactionCreate', function(interaction)
 end)
 ```
 
+### Voice channel events
+
+```lua
+client:on('voiceStateUpdate', function(voiceState)
+    if not voiceState.channelId then
+        return
+    end
+
+    print("User " .. voiceState.userId .. " joined channel: " .. voiceState.channelId)
+end)
+```
+
 ## fxmanifest
 
 Add the following to your `fxmanifest.lua` in `server_scripts`:
@@ -182,7 +194,7 @@ server_script '@cy_discord/client/main.lua'
 - [x] Message events
 - [x] Embeds support (Rich messages)
 - [x] Components (Buttons, Select Menus)
-- [ ] Voice channel events
+- [x] Voice channel events
 - [ ] Modal support
 - [ ] Permission handling
 - [ ] Webhooks support
