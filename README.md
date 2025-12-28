@@ -178,13 +178,57 @@ client:on('voiceStateUpdate', function(voiceState)
 end)
 ```
 
-## fxmanifest
+## Using in other resources
 
-Add the following to your `fxmanifest.lua` in `server_scripts`:
+To use cy_discord in your own resource, add this to your `fxmanifest.lua`:
 
 ```lua
-server_script '@cy_discord/client/main.lua'
+fx_version 'cerulean'
+game 'gta5'
 
+dependency 'cy_discord'
+
+server_scripts {
+    '@cy_discord/init.lua',
+    'server/main.lua',
+}
+
+lua54 'yes'
+```
+
+Example `server/main.lua`:
+
+```lua
+local client = Client:new {
+    token = GetConvar('discord_token', ''),
+    guildId = GetConvar('discord_guild_id', ''),
+    applicationId = GetConvar('discord_application_id', ''),
+    intents = {
+        Intents.GUILD_MESSAGES,
+    }
+}
+
+client:on('ready', function()
+    print('[MyResource] Discord connected')
+
+    local channel = client:getChannel('YOUR_CHANNEL_ID')
+    channel:send('Server started!')
+end)
+
+client:connect()
+
+AddEventHandler('playerDropped', function(reason)
+    local channel = client:getChannel('YOUR_LOG_CHANNEL_ID')
+
+    local embed = Embed:new()
+        :setTitle('Player Disconnected')
+        :setDescription(GetPlayerName(source) .. ' left the server')
+        :setColor(0xED4245)
+        :addField('Reason', reason, true)
+        :setTimestamp()
+
+    channel:send({ embeds = { embed } })
+end)
 ```
 
 ## Future Plans

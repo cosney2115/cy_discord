@@ -14,9 +14,10 @@ server_scripts {
     'structures/VoiceState.lua',
     'client/*.lua',
     'events/*.lua',
+    'init.lua',
 
     -- examples
-    'examples/*.lua',
+    -- 'examples/*.lua',
 }
 
 server_only 'yes'

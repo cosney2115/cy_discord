@@ -155,7 +155,7 @@ function Client:new(data)
     end
 
     self.init = function()
-        self.websocket = exports[GetCurrentResourceName()]:WebSocketClient(
+        self.websocket = exports['cy_discord']:WebSocketClient(
             self.data.token,
             self.data.guildId,
             self.intents
