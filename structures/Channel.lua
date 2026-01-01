@@ -27,7 +27,13 @@ function Channel:new(data, client)
             :next(function(data)
                 p:resolve(data)
             end, function(err)
-                p:reject("Discord API Error: " .. tostring(err.statusCode) .. " - " .. tostring(err.body))
+                local msg = "[cy_discord] Channel Error: " .. err.message
+                if err.details and err.details ~= "" then
+                    msg = msg .. " - " .. err.details
+                end
+
+                msg = msg .. " (channel: " .. self.id .. ")"
+                p:reject(msg)
             end)
 
         return Citizen.Await(p)
