@@ -12,6 +12,10 @@ function Events:new(client)
         AddEventHandler('discord:message', function(payload)
             self.handleMessage(payload)
         end)
+
+        AddEventHandler('discord:error', function(data)
+            self.client.emit('onError', data)
+        end)
     end
 
     self.handleMessage = function(payload)

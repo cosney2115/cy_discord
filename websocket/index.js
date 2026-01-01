@@ -8,37 +8,43 @@ class WebSocketClient {
     this.socket = null;
   }
 
-  async connect() {
+  connect() {
     this.socket = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
-    return new Promise((resolve, reject) => {
-      this.socket.on("open", () => resolve());
 
-      this.socket.on("error", (err) => reject(err));
+    this.socket.on("error", (err) => emit("discord:error", {
+      type: "error",
+      message: err.message
+    }));
 
-      this.socket.on("close", (code, reason) => console.log(`WebSocket closed - Code: ${code}, Reason: ${reason}`));
-
-      this.socket.on("message", (data) => {
-        const payload = JSON.parse(data.toString());
-
-        if (payload.op === 10) {
-          this.heartbeatInterval = payload.d.heartbeat_interval;
-          this.startHeartbeat();
-          this.identify();
-        }
-
-        if (payload.op === 0) emit("discord:message", payload);
-
-        if (payload.op === 9)
-          console.error("Invalid Session - Check token and intents!")
-
-        // if (payload.op === 11) console.log("Heartbeat ACK");
+    this.socket.on("close", (code, reason) => {
+      emit("discord:error", {
+        type: "close",
+        code,
+        reason: reason?.toString() || ""
       });
+      setTimeout(() => this.connect(), 2000);
+    });
+
+    this.socket.on("message", (data) => {
+      const payload = JSON.parse(data.toString());
+
+      if (payload.op === 10) {
+        this.heartbeatInterval = payload.d.heartbeat_interval;
+        this.startHeartbeat();
+        this.identify();
+      }
+
+      if (payload.op === 0) emit("discord:message", payload);
+
+      if (payload.op === 7 || payload.op === 9) this.socket.close();
     });
   }
 
   startHeartbeat() {
     setInterval(() => {
-      this.socket.send(JSON.stringify({ op: 1, d: null }));
+      if (this.socket?.readyState === WebSocket.OPEN) {
+        this.socket.send(JSON.stringify({ op: 1, d: null }));
+      }
     }, this.heartbeatInterval);
   }
 
@@ -49,11 +55,7 @@ class WebSocketClient {
         d: {
           token: `Bot ${this.token}`,
           intents: this.intents,
-          properties: {
-            os: "linux",
-            browser: "fivem",
-            device: "fivem",
-          },
+          properties: {}, // can be clear object
         },
       })
     );
@@ -72,13 +74,8 @@ exports("WebSocketClient", (token, guildId, intents) => {
 
   return {
     connect: (cb) => {
-      client.connect()
-        .then(() => { 
-            if (cb) cb(true); 
-        })
-        .catch((err) => { 
-            if (cb) cb(false, err.toString()); 
-        });
+      client.connect();
+      if (cb) cb(true);
     },
     send: (data) => client.send(data),
     getSocket: () => client.socket,
