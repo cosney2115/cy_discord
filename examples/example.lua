@@ -141,6 +141,16 @@ CreateThread(function()
 
         -- !ping
         if message.content == '!ping' then
+            if not message:hasRole("1433184754374672385") then
+                message:reply("You don't have permission to use this command!")
+                return
+            end
+
+            if not message:hasRole({ "1433184754374672385", "1433184754374672386" }) then
+                message:reply("You don't have permission to use this command!")
+                return
+            end
+
             message:reply("Pong!")
         end
 

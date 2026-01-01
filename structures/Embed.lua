@@ -29,47 +29,37 @@ function Embed:new(data)
     self.fields = self.fields or {}
 
     self.setTitle = function(this, title)
-        local t = title
-        if this ~= self then t = this end
+        local t = ParseArgs(this, self, title)
         self.title = t
         return self
     end
 
     self.setDescription = function(this, description)
-        local d = description
-        if this ~= self then d = this end
+        local d = ParseArgs(this, self, description)
         self.description = d
         return self
     end
 
     self.setUrl = function(this, url)
-        local u = url
-        if this ~= self then u = this end
+        local u = ParseArgs(this, self, url)
         self.url = u
         return self
     end
 
     self.setColor = function(this, color)
-        local c = color
-        if this ~= self then c = this end
+        local c = ParseArgs(this, self, color)
         self.color = c
         return self
     end
 
     self.setTimestamp = function(this, timestamp)
-        local t = timestamp
-        if this ~= self then t = this end
+        local t = ParseArgs(this, self, timestamp)
         self.timestamp = t or os.date("!%Y-%m-%dT%H:%M:%S")
         return self
     end
 
     self.setFooter = function(this, text, iconUrl)
-        local t = text
-        local i = iconUrl
-        if this ~= self then
-            t = this
-            i = text
-        end
+        local t, i = ParseArgs(this, self, text, iconUrl)
         self.footer = {
             text = t,
             icon_url = i
@@ -78,8 +68,7 @@ function Embed:new(data)
     end
 
     self.setImage = function(this, url)
-        local u = url
-        if this ~= self then u = this end
+        local u = ParseArgs(this, self, url)
         self.image = {
             url = u
         }
@@ -87,8 +76,7 @@ function Embed:new(data)
     end
 
     self.setThumbnail = function(this, url)
-        local u = url
-        if this ~= self then u = this end
+        local u = ParseArgs(this, self, url)
         self.thumbnail = {
             url = u
         }
@@ -96,14 +84,7 @@ function Embed:new(data)
     end
 
     self.setAuthor = function(this, name, url, iconUrl)
-        local n = name
-        local u = url
-        local i = iconUrl
-        if this ~= self then
-            n = this
-            u = name
-            i = url
-        end
+        local n, u, i = ParseArgs(this, self, name, url, iconUrl)
         self.author = {
             name = n,
             url = u,
@@ -113,15 +94,7 @@ function Embed:new(data)
     end
 
     self.addField = function(this, name, value, inline)
-        local n = name
-        local v = value
-        local i = inline
-        if this ~= self then
-            n = this
-            v = name
-            i = value
-        end
-
+        local n, v, i = ParseArgs(this, self, name, value, inline)
         self.fields[#self.fields + 1] = {
             name = n,
             value = v,

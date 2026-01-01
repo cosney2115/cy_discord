@@ -97,7 +97,7 @@ Client = {}
 ---@param data ClientConfig
 ---@return Client
 function Client:new(data)
-    self = setmetatable({}, Client)
+    local self = setmetatable({}, Client)
     self.websocket = nil
     self.data = data
     self.events = {}
@@ -122,13 +122,7 @@ function Client:new(data)
     self.eventHandler.init()
 
     self.on = function(this, event, callback)
-        local evt = event
-        local cb = callback
-        if this ~= self then
-            evt = this
-            cb = event
-        end
-
+        local evt, cb = ParseArgs(this, self, event, callback)
         self.events[evt] = cb
     end
 
@@ -189,10 +183,7 @@ function Client:new(data)
     end
 
     self.getChannel = function(this, channelId)
-        local id = channelId
-        if this ~= self then
-            id = this
-        end
+        local id = ParseArgs(this, self, channelId)
         return Channel:new({
             id = id,
             type = 0
@@ -200,10 +191,7 @@ function Client:new(data)
     end
 
     self.createCommand = function(this, command)
-        local cmd = command
-        if this ~= self then
-            cmd = this
-        end
+        local cmd = ParseArgs(this, self, command)
 
         local p = promise.new()
 
@@ -211,7 +199,7 @@ function Client:new(data)
             :next(function(data)
                 p:resolve(data)
             end, function(err)
-                p:reject(err)
+                p:reject("Discord API Error: " .. tostring(err.statusCode) .. " - " .. tostring(err.body))
             end)
 
         return Citizen.Await(p)

@@ -10,9 +10,7 @@ function ActionRow:new(data)
     self.components = self.components or {}
 
     self.addComponent = function(this, component)
-        local c = component
-        if this ~= self then c = this end
-
+        local c = ParseArgs(this, self, component)
         self.components[#self.components + 1] = c
         return self
     end

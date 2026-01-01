@@ -12,13 +12,9 @@ function Channel:new(data, client)
     self.client = client
 
     self.send = function(this, content)
+        local msgContent = ParseArgs(this, self, content)
+
         local body = {}
-        local msgContent = content
-
-        if this ~= self then
-            msgContent = this
-        end
-
         if type(msgContent) == "string" then
             body.content = msgContent
         elseif type(msgContent) == "table" then

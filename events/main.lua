@@ -31,6 +31,7 @@ function Events:new(client)
         end
 
         local data = payload.d
+
         if eventType == "MESSAGE_CREATE" then
             data = Message:new(data, self.client)
         elseif eventType == "INTERACTION_CREATE" then

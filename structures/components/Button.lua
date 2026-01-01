@@ -19,28 +19,19 @@ function Button:new(data)
     self.type = 2
 
     self.setStyle = function(this, style)
-        local s = style
-        if this ~= self then s = this end
+        local s = ParseArgs(this, self, style)
         self.style = s
         return self
     end
 
     self.setLabel = function(this, label)
-        local l = label
-        if this ~= self then l = this end
+        local l = ParseArgs(this, self, label)
         self.label = l
         return self
     end
 
     self.setEmoji = function(this, name, id, animated)
-        local n = name
-        local i = id
-        local a = animated
-        if this ~= self then
-            n = this
-            i = name
-            a = id
-        end
+        local n, i, a = ParseArgs(this, self, name, id, animated)
         self.emoji = {
             name = n,
             id = i,
@@ -50,22 +41,19 @@ function Button:new(data)
     end
 
     self.setCustomId = function(this, id)
-        local i = id
-        if this ~= self then i = this end
+        local i = ParseArgs(this, self, id)
         self.custom_id = i
         return self
     end
 
     self.setUrl = function(this, url)
-        local u = url
-        if this ~= self then u = this end
+        local u = ParseArgs(this, self, url)
         self.url = u
         return self
     end
 
     self.setDisabled = function(this, disabled)
-        local d = disabled
-        if this ~= self then d = this end
+        local d = ParseArgs(this, self, disabled)
         self.disabled = d
         return self
     end

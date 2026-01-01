@@ -21,62 +21,43 @@ function SelectMenu:new(data)
     self.options = self.options or {}
 
     self.setType = function(this, type)
-        local t = type
-        if this ~= self then t = this end
+        local t = ParseArgs(this, self, type)
         self.type = t
         return self
     end
 
     self.setCustomId = function(this, id)
-        local i = id
-        if this ~= self then i = this end
+        local i = ParseArgs(this, self, id)
         self.custom_id = i
         return self
     end
 
     self.setPlaceholder = function(this, placeholder)
-        local p = placeholder
-        if this ~= self then p = this end
+        local p = ParseArgs(this, self, placeholder)
         self.placeholder = p
         return self
     end
 
     self.setMinValues = function(this, min)
-        local m = min
-        if this ~= self then m = this end
+        local m = ParseArgs(this, self, min)
         self.min_values = m
         return self
     end
 
     self.setMaxValues = function(this, max)
-        local m = max
-        if this ~= self then m = this end
+        local m = ParseArgs(this, self, max)
         self.max_values = m
         return self
     end
 
     self.setDisabled = function(this, disabled)
-        local d = disabled
-        if this ~= self then d = this end
+        local d = ParseArgs(this, self, disabled)
         self.disabled = d
         return self
     end
 
     self.addOption = function(this, label, value, description, emoji, default)
-        local l = label
-        local v = value
-        local d = description
-        local e = emoji
-        local def = default
-
-        if this ~= self then
-            l = this
-            v = label
-            d = value
-            e = description
-            def = emoji
-        end
-
+        local l, v, d, e, def = ParseArgs(this, self, label, value, description, emoji, default)
         self.options[#self.options + 1] = {
             label = l,
             value = v,

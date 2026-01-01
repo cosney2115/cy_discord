@@ -10,10 +10,11 @@
 ---@field getOption fun(self: Interaction, name: string): any
 ---@field getCustomId fun(self: Interaction): string
 ---@field getValues fun(self: Interaction): table
+---@field hasRole fun(self: Interaction, roleIds: string|table): boolean
 Interaction = {}
 
 function Interaction:new(data, client)
-    local self = {}
+    self = {}
     self.id = data.id
     self.token = data.token
     self.type = data.type
@@ -23,13 +24,7 @@ function Interaction:new(data, client)
     self.client = client
 
     self.reply = function(this, content, ephemeral)
-        local msgContent = content
-        local isEphemeral = ephemeral
-
-        if this ~= self then
-            msgContent = this
-            isEphemeral = content
-        end
+        local msgContent, isEphemeral = ParseArgs(this, self, content, ephemeral)
 
         local body = {
             type = 4,
@@ -48,19 +43,6 @@ function Interaction:new(data, client)
 
         local p = promise.new()
 
-        local function sanitize(tbl)
-            if type(tbl) ~= "table" then return tbl end
-            local newTbl = {}
-            for k, v in pairs(tbl) do
-                if type(v) == "table" then
-                    newTbl[k] = sanitize(v)
-                elseif type(v) ~= "function" then
-                    newTbl[k] = v
-                end
-            end
-            return newTbl
-        end
-
         PerformHttpRequest('https://discord.com/api/v10/interactions/' .. self.id .. '/' .. self.token .. '/callback',
             function(statusCode, responseBody, headers)
                 if statusCode < 200 or statusCode >= 300 then
@@ -72,16 +54,13 @@ function Interaction:new(data, client)
                 end
 
                 p:resolve(true)
-            end, 'POST', json.encode(sanitize(body)), { ['Content-Type'] = 'application/json' })
+            end, 'POST', json.encode(Sanitize(body)), { ['Content-Type'] = 'application/json' })
 
         return Citizen.Await(p)
     end
 
     self.getOption = function(this, name)
-        local optName = name
-        if this ~= self then
-            optName = this
-        end
+        local optName = ParseArgs(this, self, name)
 
         local data = self.data
         if not data or not data.options then
@@ -96,7 +75,6 @@ function Interaction:new(data, client)
             end
         end
 
-
         return nil
     end
 
@@ -106,6 +84,28 @@ function Interaction:new(data, client)
 
     self.getValues = function()
         return self.data.values
+    end
+
+    self.hasRole = function(this, roleIds)
+        local ids = ParseArgs(this, self, roleIds)
+
+        if not self.member?.roles then
+            return false
+        end
+
+        if type(ids) ~= "table" then
+            ids = { ids }
+        end
+
+        for i = 1, #self.member.roles do
+            for j = 1, #ids do
+                if self.member.roles[i] == ids[j] then
+                    return true
+                end
+            end
+        end
+
+        return false
     end
 
     return self

@@ -41,7 +41,9 @@ class WebSocketClient {
   }
 
   startHeartbeat() {
-    setInterval(() => {
+    if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
+    
+    this.heartbeatTimer = setInterval(() => {
       if (this.socket?.readyState === WebSocket.OPEN) {
         this.socket.send(JSON.stringify({ op: 1, d: null }));
       }

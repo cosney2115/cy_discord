@@ -178,6 +178,35 @@ client:on('voiceStateUpdate', function(voiceState)
 end)
 ```
 
+### Role Checking
+
+```lua
+client:on('messageCreate', function(message)
+    if message.author.bot then
+        return
+    end
+
+    -- Check single role
+    if not message:hasRole("123456789") then
+        message:reply("No permission!")
+        return
+    end
+
+    -- Check multiple roles (returns true if user has ANY of them)
+    if not message:hasRole({ "role_id_1", "role_id_2" }) then
+        message:reply("No permission!")
+        return
+    end
+end)
+
+client:on('interactionCreate', function(interaction)
+    if not interaction:hasRole("admin_role_id") then
+        interaction:reply("No permission!", true)
+        return
+    end
+end)
+```
+
 ## Using in other resources
 
 To use cy_discord in your own resource, add this to your `fxmanifest.lua`:
@@ -239,7 +268,7 @@ end)
 - [x] Embeds support (Rich messages)
 - [x] Components (Buttons, Select Menus)
 - [x] Voice channel events
+- [x] Role checking
 - [ ] Modal support
-- [ ] Permission handling
 - [ ] Webhooks support
 - [ ] Better error handling
