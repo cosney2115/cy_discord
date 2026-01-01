@@ -1,6 +1,9 @@
 fx_version 'cerulean'
 game 'gta5'
 
+author 'cosney'
+version '1.0.4'
+
 server_scripts {
     'websocket/*.js',
     'http/main.lua',
@@ -14,6 +17,7 @@ server_scripts {
     'structures/VoiceState.lua',
     'client/*.lua',
     'events/*.lua',
+    'utils/*.lua',
     'init.lua',
 
     -- examples
