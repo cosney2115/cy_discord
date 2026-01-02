@@ -21,3 +21,12 @@ function ParseArgs(this, self, ...)
     end
     return ...
 end
+
+function BuildMessageBody(content)
+    if type(content) == "string" then
+        return {
+            content = content
+        }
+    end
+    return content or {}
+end

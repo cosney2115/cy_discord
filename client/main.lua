@@ -195,7 +195,8 @@ function Client:new(data)
 
         local p = promise.new()
 
-        self.rest:request('POST', '/applications/' .. self.data.applicationId .. '/commands', cmd)
+        local endpoint = '/applications/' .. self.data.applicationId .. '/guilds/' .. self.data.guildId .. '/commands'
+        self.rest:request('POST', endpoint, cmd)
             :next(function(data)
                 p:resolve(data)
             end, function(err)

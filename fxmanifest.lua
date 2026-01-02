@@ -19,7 +19,8 @@ server_scripts {
     'structures/VoiceState.lua',
     'client/*.lua',
     'events/*.lua',
-    'utils/*.lua',
+    'utils/helpers.lua',
+    'utils/version.lua',
     'init.lua',
 
     -- examples

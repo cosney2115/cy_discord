@@ -6,7 +6,9 @@
 ---@field member table
 ---@field channelId string
 ---@field client Client
----@field reply fun(self: Interaction, content: string|table, ephemeral: boolean): table
+---@field reply fun(self: Interaction, content: string|table, ephemeral: boolean): boolean
+---@field deferReply fun(self: Interaction, ephemeral?: boolean): boolean
+---@field followUp fun(self: Interaction, content: string|table): boolean
 ---@field showModal fun(self: Interaction, modal: ModalBuilder): boolean
 ---@field getOption fun(self: Interaction, name: string): any
 ---@field getCustomId fun(self: Interaction): string
@@ -31,35 +33,40 @@ function Interaction:new(data, client)
 
         local body = {
             type = 4,
-            data = {}
+            data = BuildMessageBody(msgContent)
         }
-
-        if type(msgContent) == "string" then
-            body.data.content = msgContent
-        elseif type(msgContent) == "table" then
-            body.data = msgContent
-        end
 
         if isEphemeral then
             body.data.flags = 64
         end
 
-        local p = promise.new()
+        return Citizen.Await(self.client.rest:callback(self.id, self.token, body))
+    end
 
-        PerformHttpRequest('https://discord.com/api/v10/interactions/' .. self.id .. '/' .. self.token .. '/callback',
-            function(statusCode, responseBody, headers)
-                if statusCode < 200 or statusCode >= 300 then
-                    p:reject({
-                        statusCode = statusCode,
-                        body = responseBody
-                    })
-                    return
-                end
+    self.deferReply = function(this, ephemeral)
+        local isEphemeral = ParseArgs(this, self, ephemeral)
 
-                p:resolve(true)
-            end, 'POST', json.encode(Sanitize(body)), { ['Content-Type'] = 'application/json' })
+        local body = {
+            type = 5,
+            data = {}
+        }
 
-        return Citizen.Await(p)
+        if isEphemeral then
+            body.data.flags = 64
+        end
+
+        return Citizen.Await(self.client.rest:callback(self.id, self.token, body))
+    end
+
+    self.followUp = function(this, content)
+        local msgContent = ParseArgs(this, self, content)
+        return Citizen.Await(
+            self.client.rest:webhook(
+                self.client.data.applicationId,
+                self.token,
+                BuildMessageBody(msgContent)
+            )
+        )
     end
 
     self.showModal = function(this, modal)
@@ -74,37 +81,19 @@ function Interaction:new(data, client)
             }
         }
 
-        local p = promise.new()
-
-        PerformHttpRequest('https://discord.com/api/v10/interactions/' .. self.id .. '/' .. self.token .. '/callback',
-            function(statusCode, responseBody, headers)
-                if statusCode < 200 or statusCode >= 300 then
-                    p:reject({
-                        statusCode = statusCode,
-                        body = responseBody
-                    })
-                    return
-                end
-
-                p:resolve(true)
-            end, 'POST', json.encode(Sanitize(body)), { ['Content-Type'] = 'application/json' })
-
-        return Citizen.Await(p)
+        return Citizen.Await(self.client.rest:callback(self.id, self.token, body))
     end
 
     self.getOption = function(this, name)
         local optName = ParseArgs(this, self, name)
 
-        local data = self.data
-        if not data or not data.options then
+        if not self.data?.options then
             return nil
         end
 
-        local options = data.options
-        for i = 1, #options do
-            local option = options[i]
-            if option.name == optName then
-                return option.value
+        for i = 1, #self.data.options do
+            if self.data.options[i].name == optName then
+                return self.data.options[i].value
             end
         end
 
@@ -134,9 +123,8 @@ function Interaction:new(data, client)
             local row = self.data.components[i]
             if row.components then
                 for j = 1, #row.components do
-                    local component = row.components[j]
-                    if component.custom_id == id then
-                        return component.value
+                    if row.components[j].custom_id == id then
+                        return row.components[j].value
                     end
                 end
             end
