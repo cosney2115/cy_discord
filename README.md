@@ -158,6 +158,16 @@ client:on('voiceStateUpdate', function(state)
 end)
 ```
 
+### Deferred Responses
+
+```lua
+interaction:deferReply(true)
+
+Wait(3000)
+
+interaction:followUp("Done!")
+```
+
 ---
 
 ## Using in Other Resources

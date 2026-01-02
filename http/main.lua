@@ -36,12 +36,12 @@ local function makeRequest(url, method, data, headers)
                 end
             end
 
-            p:reject({
-                statusCode = statusCode,
-                message = errorMsg,
-                details = details,
-                body = responseBody
-            })
+            local errorStr = errorMsg
+            if details ~= "" then
+                errorStr = errorStr .. " - " .. details
+            end
+
+            p:reject(errorStr)
             return
         end
 
