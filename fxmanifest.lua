@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'cosney'
-version '1.0.6'
+version '1.0.7'
 
 server_scripts {
     'websocket/*.js',
@@ -12,6 +12,8 @@ server_scripts {
     'structures/components/Button.lua',
     'structures/components/SelectMenu.lua',
     'structures/components/ActionRow.lua',
+    'structures/components/TextInput.lua',
+    'structures/components/ModalBuilder.lua',
     'structures/Interaction.lua',
     'structures/Embed.lua',
     'structures/VoiceState.lua',

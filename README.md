@@ -1,49 +1,46 @@
 # cy_discord
 
-**A lightweight, no-nonsense Discord wrapper for FiveM.**
+**A lightweight Discord wrapper for FiveM**
 
 <p>
   <img src="https://img.shields.io/github/v/release/cosney2115/cy_discord?style=for-the-badge&color=blue" alt="Release" />
 </p>
 
-<br />
-
 ## Features
 
-- <img src="https://img.shields.io/badge/Real--time-Fast-2ea44f?style=flat-square" valign="middle" /> Handles messages and interactions instantly.
-- <img src="https://img.shields.io/badge/Slash_Commands-Easy-0366d6?style=flat-square" valign="middle" /> Easy registration and handling.
-- <img src="https://img.shields.io/badge/Simple_API-Event--driven-f1e05a?style=flat-square" valign="middle" /> Event-driven design familiar to Discord.js users.
+- <img src="https://img.shields.io/badge/Real--time-Fast-2ea44f?style=flat-square" valign="middle" /> Handles messages and interactions instantly
+- <img src="https://img.shields.io/badge/Slash_Commands-Easy-0366d6?style=flat-square" valign="middle" /> Easy registration and handling
+- <img src="https://img.shields.io/badge/Simple_API-Event--driven-f1e05a?style=flat-square" valign="middle" /> Event-driven design familiar to Discord.js users
 
-## Installation
+## Quick Start
 
-1.  **Download**: Place `cy_discord` in your `resources` directory.
-2.  **Config**: Add `ensure cy_discord` to your `server.cfg`.
-3.  **Setup**: Set your bot credentials in `server.cfg`.
+### 1. Installation
 
-## Configuration
+```
+resources/
+└── cy_discord/
+    └── (place files here)
+```
 
-Add the following to your `server.cfg`:
+Add to `server.cfg`:
 
 ```cfg
+ensure cy_discord
+
 set discord_token "YOUR_BOT_TOKEN"
 set discord_guild_id "YOUR_GUILD_ID"
 set discord_application_id "YOUR_APPLICATION_ID"
 ```
 
-## Usage
-
-### Initialization
+### 2. Basic Usage
 
 ```lua
-local client = Client:new({
-    token = GetConvar('discord_token', ""),
-    guildId = GetConvar('discord_guild_id', ""),
-    applicationId = GetConvar('discord_application_id', ""),
-    intents = {
-        Intents.GUILD_MESSAGES,
-        Intents.MESSAGE_CONTENT
-    }
-})
+local client = Client:new {
+    token = GetConvar('discord_token', ''),
+    guildId = GetConvar('discord_guild_id', ''),
+    applicationId = GetConvar('discord_application_id', ''),
+    intents = { Intents.GUILD_MESSAGES, Intents.MESSAGE_CONTENT }
+}
 
 client:on('ready', function()
     print('Bot is ready!')
@@ -52,21 +49,19 @@ end)
 client:connect()
 ```
 
+---
+
+## Examples
+
 ### Slash Commands
 
 ```lua
--- Register command on ready
 client:on('ready', function()
-    client:createCommand({
-        name = 'ping',
-        description = 'Replies with Pong!'
-    })
+    client:createCommand({ name = 'ping', description = 'Pong!' })
 end)
 
--- Handle interactions
 client:on('interactionCreate', function(interaction)
     if interaction.data.name == 'ping' then
-        -- Second argument 'true' sends an ephemeral message
         interaction:reply('Pong! 🏓', true)
     end
 end)
@@ -76,10 +71,12 @@ end)
 
 ```lua
 client:on('messageCreate', function(message)
-    if message.author.bot then return end
+    if message.author.bot then
+        return
+    end
 
     if message.content == '!hello' then
-        message:reply('Hello world!')
+        message:reply('Hello!')
     end
 end)
 ```
@@ -87,129 +84,85 @@ end)
 ### Embeds
 
 ```lua
-client:on('interactionCreate', function(interaction)
-    if interaction.data.name == 'embed' then
-        local embed = Embed:new()
-            :setTitle("Hello World")
-            :setDescription("This is an embed")
-            :setColor(0x00FF00)
-            :addField("Field 1", "Value 1", true)
-            :addField("Field 2", "Value 2", true)
-            :setFooter("Footer text", "https://picsum.photos/200")
+local embed = Embed:new()
+    :setTitle("Title")
+    :setDescription("Description")
+    :setColor(0x5865F2)
+    :addField("Field", "Value", true)
+    :setTimestamp()
 
-        interaction:reply({
-            embeds = { --[[ array of embeds ]]
-                embed
-            }
-        }, false --[[ ephemeral ]])
-        return
-    end
-end)
+interaction:reply({ embeds = { embed } })
 ```
 
 ### Components
 
 ```lua
-client:on('interactionCreate', function(interaction)
-    if interaction.data.name ~= 'components' then
-        return
-    end
-
-    local row = ActionRow:new()
-        :addComponent(
-            Button:new()
+local row = ActionRow:new()
+    :addComponent(
+        Button:new()
             :setLabel("Click Me")
             :setStyle(1)
-            :setCustomId("click_one")
-        )
-        :addComponent(
-            Button:new()
-            :setLabel("Danger")
-            :setStyle(4)
-            :setCustomId("click_two")
-            :setDisabled(true)
-        )
+            :setCustomId("btn_click")
+    )
 
-    local row2 = ActionRow:new()
-        :addComponent(
-            SelectMenu:new()
-            :setCustomId("select_one")
-            :setPlaceholder("Choose an option")
-            :addOption("Option 1", "opt_1", "This is option 1", { name = "👍" })
-            :addOption("Option 2", "opt_2", "This is option 2")
-        )
+interaction:reply({ content = "Buttons!", components = { row } })
 
-    interaction:reply({
-        content = "Look at these components!",
-        components = {
-            row,
-            row2
-        }
-    }, false)
-end)
+if interaction:getCustomId() == "btn_click" then
+    interaction:reply("Clicked!", true)
+end
 ```
 
-### Component Interactions
+### Modals
 
 ```lua
-client:on('interactionCreate', function(interaction)
-    if interaction:getCustomId() == 'click_one' then
-        interaction:reply('You clicked the button!', true)
-        return
-    end
+local modal = ModalBuilder:new()
+    :setTitle("Report")
+    :setCustomId("report_modal")
+    :addComponents(
+        TextInput:new()
+            :setCustomId("reason")
+            :setLabel("Reason")
+            :setStyle(TextInputStyle.Paragraph)
+            :setRequired(true)
+    )
 
-    if interaction:getCustomId() == 'select_one' then
-        local values = interaction:getValues()
-        interaction:reply('You selected: ' .. json.encode(values), true)
-        return
-    end
-end)
-```
+interaction:showModal(modal)
 
-### Voice channel events
-
-```lua
-client:on('voiceStateUpdate', function(voiceState)
-    if not voiceState.channelId then
-        return
-    end
-
-    print("User " .. voiceState.userId .. " joined channel: " .. voiceState.channelId)
-end)
+if interaction:isModalSubmit() then
+    local reason = interaction:getTextInputValue("reason")
+    interaction:reply("Submitted: " .. reason, true)
+end
 ```
 
 ### Role Checking
 
 ```lua
-client:on('messageCreate', function(message)
-    if message.author.bot then
-        return
-    end
+if not message:hasRole("123456789") then
+    message:reply("No permission!")
+    return
+end
 
-    -- Check single role
-    if not message:hasRole("123456789") then
-        message:reply("No permission!")
-        return
-    end
+if not interaction:hasRole({ "role1", "role2" }) then
+    interaction:reply("No permission!", true)
+    return
+end
+```
 
-    -- Check multiple roles (returns true if user has ANY of them)
-    if not message:hasRole({ "role_id_1", "role_id_2" }) then
-        message:reply("No permission!")
-        return
-    end
-end)
+### Voice Events
 
-client:on('interactionCreate', function(interaction)
-    if not interaction:hasRole("admin_role_id") then
-        interaction:reply("No permission!", true)
-        return
+```lua
+client:on('voiceStateUpdate', function(state)
+    if state.channelId then
+        print(state.userId .. " joined " .. state.channelId)
     end
 end)
 ```
 
-## Using in other resources
+---
 
-To use cy_discord in your own resource, add this to your `fxmanifest.lua`:
+## Using in Other Resources
+
+`fxmanifest.lua`:
 
 ```lua
 fx_version 'cerulean'
@@ -219,56 +172,22 @@ dependency 'cy_discord'
 
 server_scripts {
     '@cy_discord/init.lua',
-    'server/main.lua',
+    'server/main.lua'
 }
 
 lua54 'yes'
 ```
 
-Example `server/main.lua`:
+---
 
-```lua
-local client = Client:new {
-    token = GetConvar('discord_token', ''),
-    guildId = GetConvar('discord_guild_id', ''),
-    applicationId = GetConvar('discord_application_id', ''),
-    intents = {
-        Intents.GUILD_MESSAGES,
-    }
-}
-
-client:on('ready', function()
-    print('[MyResource] Discord connected')
-
-    local channel = client:getChannel('YOUR_CHANNEL_ID')
-    channel:send('Server started!')
-end)
-
-client:connect()
-
-AddEventHandler('playerDropped', function(reason)
-    local channel = client:getChannel('YOUR_LOG_CHANNEL_ID')
-
-    local embed = Embed:new()
-        :setTitle('Player Disconnected')
-        :setDescription(GetPlayerName(source) .. ' left the server')
-        :setColor(0xED4245)
-        :addField('Reason', reason, true)
-        :setTimestamp()
-
-    channel:send({ embeds = { embed } })
-end)
-```
-
-## Future Plans
+## Roadmap
 
 - [x] Event handler
 - [x] Slash commands
-- [x] Message events
-- [x] Embeds support (Rich messages)
-- [x] Components (Buttons, Select Menus)
-- [x] Voice channel events
+- [x] Messages
+- [x] Embeds
+- [x] Components
+- [x] Voice events
 - [x] Role checking
-- [ ] Modal support
-- [ ] Webhooks support
-- [ ] Better error handling
+- [x] Modals
+- [ ] Webhooks
