@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'cosney'
-version '1.0.7'
+version '1.0.8'
 
 server_scripts {
     'websocket/*.js',
