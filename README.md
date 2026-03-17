@@ -112,6 +112,54 @@ if interaction:getCustomId() == "btn_click" then
 end
 ```
 
+### Components V2 (Selects)
+
+```lua
+local row = ActionRow:new()
+    :addComponent(
+        UserSelect:new()
+            :setCustomId("user_select")
+            :setPlaceholder("Choose up to 2 users")
+            :setMaxValues(2)
+    )
+
+local row2 = ActionRow:new()
+    :addComponent(
+        ChannelSelect:new()
+            :setCustomId("channel_select")
+            :addChannelType(0) -- Text Channels only
+    )
+
+interaction:reply({
+    content = "Select something:",
+    components = { row, row2 }
+})
+```
+
+### Embeds V2 (Visual Components)
+
+Discord's newer Visual Components replace traditional `Embeds`. You **must** pass `components_v2 = true` in the reply payload for these to work!
+
+```lua
+local container = Container:new()
+    :setAccentColor(0x42f560)
+    :addComponent(
+        TextDisplay:new()
+            :setContent("# New Update!\\nThis replaces old embeds.")
+    )
+    :addComponent(Separator:new():setDivider(true))
+    :addComponent(
+        Section:new()
+            :addComponent(TextDisplay:new():setContent("Here is a section."))
+            :setAccessory(Thumbnail:new():setMedia("https://picsum.photos/200"))
+    )
+
+interaction:reply({
+    components_v2 = true,
+    components = { container }
+})
+```
+
 ### Modals
 
 ```lua
@@ -197,6 +245,8 @@ lua54 'yes'
 - [x] Messages
 - [x] Embeds
 - [x] Components
+- [x] Components V2 (User/Role/Channel Selects)
+- [x] Embeds V2 (Visual Components)
 - [x] Voice events
 - [x] Role checking
 - [x] Modals

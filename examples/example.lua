@@ -52,6 +52,31 @@ CreateThread(function()
             name = "components",
             description = "Test components (buttons, select menus)"
         })
+
+        client:createCommand({
+            name = "components_v2",
+            description = "Test components V2 (User, Role, Channel, Mentionable Selects)"
+        })
+
+        client:createCommand({
+            name = "embeds_v2",
+            description = "Test visual components V2 (Container, Section, etc)"
+        })
+
+        client:createCommand({
+            name = "embe3ds_v2",
+            description = "Test visual components V2 (Container, Section, etc)"
+        })
+
+        client:createCommand({
+            name = "emb2eds_v2",
+            description = "Test visual components V2 (Container, Section, etc)"
+        })
+
+        client:createCommand({
+            name = "embe1ds_v2",
+            description = "Test visual components V2 (Container, Section, etc)"
+        })
     end)
 
     client:on("interactionCreate", function(interaction)
@@ -122,6 +147,81 @@ CreateThread(function()
             return
         end
 
+        if interaction.data.name == "components_v2" then
+            local row1 = ActionRow:new()
+                :addComponent(
+                    UserSelect:new()
+                    :setCustomId("user_select")
+                    :setPlaceholder("Choose a user")
+                    :setMaxValues(2)
+                )
+
+            local row2 = ActionRow:new()
+                :addComponent(
+                    RoleSelect:new()
+                    :setCustomId("role_select")
+                    :setPlaceholder("Choose a role")
+                )
+
+            local row3 = ActionRow:new()
+                :addComponent(
+                    MentionableSelect:new()
+                    :setCustomId("mentionable_select")
+                    :setPlaceholder("Choose a mentionable")
+                )
+
+            local row4 = ActionRow:new()
+                :addComponent(
+                    ChannelSelect:new()
+                    :setCustomId("channel_select")
+                    :setPlaceholder("Choose a channel")
+                    :addChannelType(0) -- Text Channel
+                )
+
+            interaction:reply({
+                content = "Select from the new V2 components:",
+                components = {
+                    row1,
+                    row2,
+                    row3,
+                    row4
+                }
+            }, false)
+            return
+        end
+
+        if interaction.data.name == "embeds_v2" then
+            local container = Container:new()
+                :setAccentColor(0x42f560)
+                :addComponent(
+                    TextDisplay:new()
+                    :setContent("# Embeds V2 Example Containers and Sections replace old Embeds.")
+                )
+                :addComponent(
+                    Separator:new()
+                    :setDivider(true)
+                )
+                :addComponent(
+                    Section:new()
+                    :addComponent(
+                        TextDisplay:new()
+                        :setContent("This is a Section with a Thumbnail accessory.")
+                    )
+                    :setAccessory(
+                        Thumbnail:new()
+                        :setMedia("https://picsum.photos/200")
+                    )
+                )
+
+            interaction:reply({
+                components_v2 = true,
+                components = {
+                    container
+                }
+            }, false)
+            return
+        end
+
         -- Component Interactions
         if interaction:getCustomId() == "click_one" then
             interaction:reply("You clicked the button!", true)
@@ -131,6 +231,30 @@ CreateThread(function()
         if interaction:getCustomId() == "select_one" then
             local values = interaction:getValues()
             interaction:reply("You selected: " .. json.encode(values), true)
+            return
+        end
+
+        if interaction:getCustomId() == "user_select" then
+            local values = interaction:getValues()
+            interaction:reply("You selected users: " .. json.encode(values), true)
+            return
+        end
+
+        if interaction:getCustomId() == "role_select" then
+            local values = interaction:getValues()
+            interaction:reply("You selected roles: " .. json.encode(values), true)
+            return
+        end
+
+        if interaction:getCustomId() == "mentionable_select" then
+            local values = interaction:getValues()
+            interaction:reply("You selected mentionables: " .. json.encode(values), true)
+            return
+        end
+
+        if interaction:getCustomId() == "channel_select" then
+            local values = interaction:getValues()
+            interaction:reply("You selected channels: " .. json.encode(values), true)
             return
         end
     end)

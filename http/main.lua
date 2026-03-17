@@ -21,33 +21,50 @@ local errorMessages = {
 local function makeRequest(url, method, data, headers)
     local p = promise.new()
 
-    PerformHttpRequest(url, function(statusCode, responseBody)
-        if statusCode < 200 or statusCode >= 300 then
-            local errorMsg = errorMessages[statusCode] or "Unknown Error"
-            local details = ""
-
-            local success, parsed = pcall(json.decode, responseBody)
-            if success and parsed then
-                if parsed.message then
-                    details = parsed.message
+    local function doRequest()
+        PerformHttpRequest(url, function(statusCode, responseBody, responseHeaders)
+            if statusCode == 429 then
+                local retryAfter = 1.0
+                local success, parsed = pcall(json.decode, responseBody)
+                if success and parsed and parsed.retry_after then
+                    retryAfter = tonumber(parsed.retry_after) or 1.0
                 end
-                if parsed.code then
-                    details = details .. " (code: " .. parsed.code .. ")"
-                end
+                
+                SetTimeout(math.ceil(retryAfter * 1000) + 100, function()
+                    doRequest()
+                end)
+                return
             end
 
-            local errorStr = errorMsg
-            if details ~= "" then
-                errorStr = errorStr .. " - " .. details
+            if statusCode < 200 or statusCode >= 300 then
+                local errorMsg = errorMessages[statusCode] or "Unknown Error"
+                local details = ""
+
+                local success, parsed = pcall(json.decode, responseBody)
+                if success and parsed then
+                    if parsed.message then
+                        details = parsed.message
+                    end
+                    if parsed.code then
+                        details = details .. " (code: " .. parsed.code .. ")"
+                    end
+                end
+
+                local errorStr = errorMsg
+                if details ~= "" then
+                    errorStr = errorStr .. " - " .. details
+                end
+
+                p:reject(errorStr)
+                return
             end
 
-            p:reject(errorStr)
-            return
-        end
+            local success, body = pcall(json.decode, responseBody)
+            p:resolve(success and body or true)
+        end, method, data and json.encode(Sanitize(data)) or "", headers)
+    end
 
-        local success, body = pcall(json.decode, responseBody)
-        p:resolve(success and body or true)
-    end, method, data and json.encode(Sanitize(data)) or "", headers)
+    doRequest()
 
     return p
 end

@@ -14,12 +14,7 @@ function Channel:new(data, client)
     self.send = function(this, content)
         local msgContent = ParseArgs(this, self, content)
 
-        local body = {}
-        if type(msgContent) == "string" then
-            body.content = msgContent
-        elseif type(msgContent) == "table" then
-            body = msgContent
-        end
+        local body = BuildMessageBody(msgContent)
 
         local p = promise.new()
 

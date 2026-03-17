@@ -28,5 +28,12 @@ function BuildMessageBody(content)
             content = content
         }
     end
-    return content or {}
+    
+    local body = content or {}
+    if body.components_v2 then
+        body.flags = (body.flags or 0) | 32768
+        body.components_v2 = nil
+    end
+
+    return body
 end

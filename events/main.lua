@@ -41,6 +41,24 @@ function Events:new(client)
         end
 
         self.client.emit(eventName, data)
+
+        if eventType == "READY" then
+            if #self.client.buffered_commands > 0 then
+                CreateThread(function()
+                    Wait(1000)
+                    local success, err = pcall(function()
+                        self.client:registerCommands(self.client.buffered_commands)
+                    end)
+                    if success then
+                        print("[cy_discord] Successfully auto-registered " ..
+                            #self.client.buffered_commands .. " slash commands.")
+                        return
+                    end
+
+                    self.client.emit("error", "Failed to auto-register commands: " .. tostring(err))
+                end)
+            end
+        end
     end
 
     return self

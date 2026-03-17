@@ -36,9 +36,13 @@ function Interaction:new(data, client)
             data = BuildMessageBody(msgContent)
         }
 
+        local currentFlags = body.data.flags or 0
+
         if isEphemeral then
-            body.data.flags = 64
+            currentFlags = currentFlags | 64
         end
+
+        body.data.flags = currentFlags
 
         return Citizen.Await(self.client.rest:callback(self.id, self.token, body))
     end

@@ -92,6 +92,7 @@ OptionType = {
 ---@field emit fun(self: Client, event: string, ...: any)
 ---@field getChannel fun(self: Client, channelId: string): Channel
 ---@field createCommand fun(self: Client, command: Command): table
+---@field registerCommands fun(self: Client, commands: table): table
 Client = {}
 
 ---@param data ClientConfig
@@ -103,6 +104,7 @@ function Client:new(data)
     self.events = {}
     self.intents = 0
     self.isReady = false
+    self.buffered_commands = {}
     self.rest = RequestHandler:new(data.token)
 
     assert(data.token, "Missing token")
@@ -192,15 +194,21 @@ function Client:new(data)
 
     self.createCommand = function(this, command)
         local cmd = ParseArgs(this, self, command)
+        self.buffered_commands[#self.buffered_commands + 1] = cmd
+        return self
+    end
+
+    self.registerCommands = function(this, commands)
+        local cmds = ParseArgs(this, self, commands)
 
         local p = promise.new()
 
         local endpoint = '/applications/' .. self.data.applicationId .. '/guilds/' .. self.data.guildId .. '/commands'
-        self.rest:request('POST', endpoint, cmd)
+        self.rest:request('PUT', endpoint, cmds)
             :next(function(data)
                 p:resolve(data)
             end, function(err)
-                p:reject("Discord API Error: " .. tostring(err.statusCode) .. " - " .. tostring(err.body))
+                p:reject("Discord API Error: " .. tostring(err))
             end)
 
         return Citizen.Await(p)
